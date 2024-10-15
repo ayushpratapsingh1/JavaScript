@@ -21,11 +21,26 @@ for (let select of dropdown) {
       select.append(newOption);
     }
     select.addEventListener("change", (e) => {
-        result.classList.add("hide");
+        updateExchangeRate();
         updateFlag(e.target);
     });
 }
-
+const updateExchangeRate = async () => {
+    let amount = document.querySelector(".amount input");
+    let amt = amount.value;
+    if(amt === "" || amt < 1){
+        amt = 1;
+        amount.value = "1";
+        alert("Please enter a valid amount");
+        return;
+    }
+    const URL =  `${BaseURL}/${from.value.toLowerCase()}.json`;
+    let response = await fetch(URL);
+    let data = await response.json();
+    let rate = data[from.value.toLowerCase()][to.value.toLowerCase()];
+    let newAmount = (amt * rate).toFixed(4);
+    result.innerText = `${amt} ${from.value} = ${newAmount} ${to.value}`;
+  };
 const updateFlag = (e) => {
     let code = e.value;
     let countrycode=countryList[code];
@@ -49,10 +64,10 @@ btn.addEventListener("click", async (e) => {
     let rate = data[from.value.toLowerCase()][to.value.toLowerCase()];
     let newAmount = (amt * rate).toFixed(4);
     result.innerText = `${amt} ${from.value} = ${newAmount} ${to.value}`;
-    result.classList.remove("hide");
-    console.log(rate)
 })
-
+window.addEventListener("load", () => {
+    updateExchangeRate();
+  });
 
 
 
